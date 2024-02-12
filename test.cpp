@@ -2,33 +2,57 @@
 #include "Wizard.h"
 using namespace std;
 using namespace GiNaC;
-Geo::Variable Geo::var;
-void append(lst& l1, const ex& l2)
-{
-	for(int i=0;i<l2.nops();i++)l1.append(l2[i]);
-}
+using namespace Wizard;
+
 int main()
 {
-	Geo::Point A(Geo::HilbertSt::st1());
-	Geo::Point B(Geo::HilbertSt::st1());
-	Geo::Point D(Geo::HilbertSt::st1());
-	Geo::HilbertSt::GeoEx ge_C=Geo::HilbertSt::st10(B, D, Geo::Line(A, D), Geo::Line(A, B));
-	Geo::Point C(ge_C.p);
-	ex slvC=lsolve(ge_C.e, ge_C.v);
-	//cout<<"slvC:\t"<<slvC<<endl;
-	lst chng;	append(chng, slvC);
-	
-	Geo::HilbertSt::GeoEx ge_E=Geo::HilbertSt::st8(Geo::Line(A, C), Geo::Line(B, D));
-	Geo::Point E(ge_E.p);
-	ge_E.e=ge_E.e.subs(chng);
-	ex slvE=lsolve(ge_E.e, ge_E.v);
-	cout<<"slvE:\t"<<slvE<<endl<<endl;
 
-	lst conc={};
-	lst conc1=Geo::Midpoint(E, A, C);
-	lst conc2=Geo::Midpoint(E, B, D);
-	append(conc, conc1);
-	append(conc, conc2);
-	cout<<"conc:"<<conc<<endl;
+/*		   D/------------------/C		*
+ *		   /  \			    / /			*
+ *		  /	    \ 	    /	 /			*
+ *		 /	      \	/		/			*
+ *		/		 /E\	   /			*
+ *	   /	 /	 	 \    /				*
+ *    /	/			   \ /				*
+ *	A/------------------/B				*/
+ 
+ /*Known: AB||CD, AD||BC, E∈AC, E∈BD	*/
+ /*Proposition: AE=CE, BE=DE			*/
+ 
+	/*create points*/
+	Point A(HilbertSt::st1());
+	Point B(HilbertSt::st1());
+	Point D(HilbertSt::st1());
+	/*C is the intersection point of BC and CD, which is also the parallel lines of AD and AB.*/
+	HilbertSt::GeoEx ge_C=HilbertSt::st10(B, D, Line(A, D), Line(A, B));
+	Point C(ge_C.p);
+	/*solve the equations of C*/
+	ex slvC=lsolve(ge_C.e, ge_C.v);
+	/*change of variable*/
+	lst cov;	append(cov, slvC);
+	/*E is the intersection point of AC and BD.*/
+	HilbertSt::GeoEx ge_E=HilbertSt::st8(Line(A, C), Line(B, D));
+	Point E(ge_E.p);
+	/*change the variable*/
+	ge_E.e=ge_E.e.subs(cov);
+	ex slvE=lsolve(ge_E.e, ge_E.v);
+	cout<<"slvE:"<<slvE<<endl;
+	lst slvE_lst;	append(slvE_lst, slvE);
+	
+	/*solve the equations about the proposition*/
+	lst prop={};
+	/*In fact, point C is controlled by point A, B and D.*/
+	/*So we don't add the proposition.*/
+	//lst prop1=Midpoint(E, A, C);
+	lst prop2=Midpoint(E, B, D);
+	//append(prop, prop1);
+	append(prop, prop2);
+	cout<<"prop:"<<prop<<endl;
+	
+	/*judge if the two lists are equivalent*/
+	if(EquivalentProp(slvE_lst, prop))
+		cout<<"true"<<endl;
+	else cout<<"false"<<endl;
+	
 	return 0;
 }
