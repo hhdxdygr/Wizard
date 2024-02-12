@@ -11,8 +11,7 @@
 
 using namespace std;
 using namespace GiNaC;
-DECLARE_FUNCTION_2P(root)
-#define ERR_01 "INVALID_ARGUMENT"
+
 namespace Wizard
 {
 	/*Definition of Point*/
@@ -20,6 +19,7 @@ namespace Wizard
 	{
 	public:
 		Point(){}
+		~Point(){}
 		Point(const ex& _x, const ex& _y)
 		{
 			x=_x, y=_y;
@@ -28,6 +28,11 @@ namespace Wizard
 		{
 			x=_p.x, y=_p.y;
 		}
+		void print()
+		{
+			cout<<"("<<x<<","<<y<<")"<<endl;
+			return;
+		}
 		ex x, y;
 	};
 	/*Definition of Line*/
@@ -35,6 +40,7 @@ namespace Wizard
 	{
 	public:
 		Line(){}
+		~Line(){}
 		Line(const Point& _p1, const Point& _p2)
 		{
 			x1=_p1.x, x2=_p2.x, y1=_p1.y, y2=_p2.y;
@@ -51,6 +57,7 @@ namespace Wizard
 	{
 	public:
 		Segment(){}
+		~Segment(){}
 		Segment(const Point& _p1, const Point& _p2)
 		{
 			x1=_p1.x, x2=_p2.x, y1=_p1.y, y2=_p2.y;
@@ -137,6 +144,7 @@ namespace Wizard
         	if(!prop1.has(*i))return false;
         return true;
 	}
+	/*append ex to lst without '{' or '}'*/
 	void append(lst& l1, const ex& l2)
 	{
 		for(int i=0;i<l2.nops();i++)
@@ -150,6 +158,7 @@ namespace Wizard
 		class GeoEx
 		{
 		public:
+			~GeoEx(){}
 			GeoEx(const Point& _p, const ex& _e, const lst& _v)
 			{
 				p.x=_p.x, p.y=_p.y, e=_e, v=_v;
@@ -170,15 +179,17 @@ namespace Wizard
 				l.x1=_l.x1, l.x2=_l.x2, l.y1=_l.y1, l.y2=_l.y2, e=_e, D=_D, v=_v;
 				type=21;
 			}
-			Point p;
-			Line l;
-			ex e, D;
-			lst v;
+			Point p;	//store a point
+			Line l;		//store a line
+			ex e, D;	//e is the expression
+						//D is the generic condition
+			lst v;		//the variable that should be solved
 			/*type: 10->Point;	20->Line;	*
 			 *		11->Point&D;21->Line&D;	*/
 			int type;
 		};
 		HilbertSt(){}
+		~HilbertSt(){}
 		/*steps which create new u_i; we don't care about step4.*/
 		static Point st1() {symbol u1, u2; return Point(u1, u2);}
 		static Line st2() {symbol u1, u2, u3, u4; return Line(Point(u1, u2), Point(u3, u4));}

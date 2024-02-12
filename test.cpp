@@ -36,7 +36,7 @@ int main()
 	/*change the variable*/
 	ge_E.e=ge_E.e.subs(cov);
 	ex slvE=lsolve(ge_E.e, ge_E.v);
-	cout<<"slvE:"<<slvE<<endl;
+	//cout<<"slvE:"<<slvE<<endl;
 	lst slvE_lst;	append(slvE_lst, slvE);
 	
 	/*solve the equations about the proposition*/
@@ -47,11 +47,20 @@ int main()
 	lst prop2=Midpoint(E, B, D);
 	//append(prop, prop1);
 	append(prop, prop2);
-	cout<<"prop:"<<prop<<endl;
+	//cout<<"prop:"<<prop<<endl;
 	
 	/*judge if the two lists are equivalent*/
 	if(EquivalentProp(slvE_lst, prop))
+	{
 		cout<<"true"<<endl;
+		cout<<"Note:\n";
+		cout<<"A";A.print();
+		cout<<"B";B.print();
+		cout<<"C";C.print();
+		cout<<"D";D.print();
+		cout<<"E";E.print();
+		cout<<"the generic condition is\n"<<ge_C.D<<endl<<ge_E.D<<endl;
+	}
 	else cout<<"false"<<endl;
 	
 	return 0;
