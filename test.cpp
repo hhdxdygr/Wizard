@@ -8,16 +8,16 @@ int main()
 {
 
 /*		   D/------------------/C		*
- *		   /  \			    / /			*
- *		  /	    \ 	    /	 /			*
- *		 /	      \	/		/			*
- *		/		 /E\	   /			*
- *	   /	 /	 	 \    /				*
- *    /	/			   \ /				*
- *	A/------------------/B				*/
+ *		   /  \		    / /			*
+ *		  /	\       /    /			*
+ *		 /	  \  /      /			*
+ *		/        / E\      /			*
+ *	       /     /	      \   /			*
+ *	      /	/	       \ /			*
+ *	    A/------------------/B				*/
  
  /*Known: AB||CD, AD||BC, E∈AC, E∈BD	*/
- /*Proposition: AE=CE, BE=DE			*/
+ /*Proposition: AE=CE, BE=DE		*/
  
 	/*create points*/
 	Point A(HilbertSt::st1());

@@ -67,7 +67,7 @@ namespace Wizard
 /*Now we define the four relations of points and line segments.*/
 	
 	/*parallel line segments:	A-------B	*
-	 *							C-------D	*/
+	 *				C-------D	*/
 	GiNaC::ex parallel(const Segment& _s1, const Segment& _s2)
 	{
 		return ((_s1.y1-_s1.y2)*(_s2.x1-_s2.x2)-(_s2.y1-_s2.y2)*(_s1.x1-_s1.x2)==0);
@@ -78,9 +78,9 @@ namespace Wizard
 		return parallel(Segment(_p1, _p2), Segment(_p3, _p4));
 	}
 	/*perpendicular line segments:	A----+--B	*
-	 *									C|		*
-	 *								 	 |		*
-	 *									D|		*/
+	 *				    C|		*
+	 *			 	     |		*
+	 *				    D|		*/
 	GiNaC::ex perpendicular(const Segment& _s1, const Segment& _s2/*, const int& _k=1*/)
 	{
 		return ((_s1.y1-_s1.y2)*(_s2.y1-_s2.y2)+(_s1.x1-_s1.x2)*(_s2.x1-_s2.x2)==0);
@@ -112,10 +112,10 @@ namespace Wizard
 	
 	
 	/*a section point:	(internal): 	A-----C----------B		*
-	 *		  			(external):		A---------B------C		*
+	 *		  	(external):	A---------B------C		*
 	 * We define section=AC/BC.(A(_s.x1,_s.y1), B(_s.x2,_s.y2))	*/
 	GiNaC::lst SectionPoint(	const Point& _p, const Segment& _s,	//type:	false->internal 
-		       					const ex& _section, bool type=false)  	// 	true ->external
+		       			const ex& _section, bool type=false)  	// 	true ->external
 	{
 		if(type==false)		//internal
 			return 	lst{_p.x==(_section*_s.x2+_s.x1)/(_section+1),
@@ -204,22 +204,22 @@ namespace Wizard
 		{
 			symbol x1, x2;
 			return GeoEx(Point(x1, x2), lst{((l1.y1-l1.y2)*x1-(l1.x1-l1.x2)*x2+l1.x1*l1.y2-l1.x2*l1.y1==0), 
-											((l2.y1-l2.y2)*x1-(l2.x1-l2.x2)*x2+l2.x1*l2.y2-l2.x2*l2.y1==0)},
-						 ex(determinant(matrix{{l1.y1-l2.y2, l1.x2-l1.x1}, {l2.y1-l2.y2, l2.x2-l2.x1}})!=0), lst{x1, x2});
+							((l2.y1-l2.y2)*x1-(l2.x1-l2.x2)*x2+l2.x1*l2.y2-l2.x2*l2.y1==0)},
+				     ex(determinant(matrix{{l1.y1-l2.y2, l1.x2-l1.x1}, {l2.y1-l2.y2, l2.x2-l2.x1}})!=0), lst{x1, x2});
 		}
 		static GeoEx st9(const Point& p, const Line& l1, const Line& l2)
 		{
 			symbol x1, x2;
 			return GeoEx(Point(x1, x2), lst{((l1.x2-l1.x1)*(x2-p.y)-(l1.y2-l1.y1)*(x1-p.x)==0),
-											((l2.y1-l2.y2)*x1-(l2.x1-l2.x2)*x2+l2.x1*l2.y2-l2.x2*l2.y1==0)},
-						 ex(determinant(matrix{{l1.y2-l1.y1, l1.x1-l1.x2}, {l2.y1-l2.y2, l2.x2-l2.x1}})!=0), lst{x1, x2});
+							((l2.y1-l2.y2)*x1-(l2.x1-l2.x2)*x2+l2.x1*l2.y2-l2.x2*l2.y1==0)},
+				     ex(determinant(matrix{{l1.y2-l1.y1, l1.x1-l1.x2}, {l2.y1-l2.y2, l2.x2-l2.x1}})!=0), lst{x1, x2});
 		}
 		static GeoEx st10(const Point& p1, const Point& p2, const Line& l1, const Line& l2) 
 		{
 			symbol x1, x2;
 			return GeoEx(Point(x1, x2), lst{((p1.y-x2)*(l1.x2-l1.x1)-(l1.y2-l1.y1)*(p1.x-x1)==0),
-											((p2.y-x2)*(l2.x2-l2.x1)-(l2.y2-l2.y1)*(p2.x-x1)==0)},
-						 ex(determinant(matrix{{l1.y2-l1.y1, l1.x1-l1.x2}, {l2.y2-l2.y1, l2.x1-l2.x2}})!=0), lst{x1, x2});
+							((p2.y-x2)*(l2.x2-l2.x1)-(l2.y2-l2.y1)*(p2.x-x1)==0)},
+				     ex(determinant(matrix{{l1.y2-l1.y1, l1.x1-l1.x2}, {l2.y2-l2.y1, l2.x1-l2.x2}})!=0), lst{x1, x2});
 		}
 	};
 /*****************************HILBERT STEPS END**************************************/
