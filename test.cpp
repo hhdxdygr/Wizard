@@ -14,7 +14,7 @@ int main()
  *		/        / E\      /			*
  *	       /     /	      \   /			*
  *	      /	/	       \ /			*
- *	    A/------------------/B				*/
+ *	    A/------------------/B			*/
  
  /*Known: AB||CD, AD||BC, E∈AC, E∈BD	*/
  /*Proposition: AE=CE, BE=DE		*/
