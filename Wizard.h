@@ -142,7 +142,16 @@ namespace Wizard
         	if(!prop2.has(*i))return false;
 		for(lst::const_iterator i=prop2.begin(); i!=prop2.end(); ++i)
         	if(!prop1.has(*i))return false;
-        return true;
+        	return true;
+	}
+	/*substitute slv into prop_eqn and judge*/
+	bool SubsProp(const lst& slv, const ex& prop_eqn)
+	{
+		ex prv=prop_eqn.subs(slv);
+		relational rel=ex_to<relational>(prv);
+		if(ex_to<relational>(rel.canonical().normal()))
+			return true;
+		return false;
 	}
 	/*append ex to lst without '{' or '}'*/
 	void append(lst& l1, const ex& l2)
@@ -179,13 +188,23 @@ namespace Wizard
 				l.x1=_l.x1, l.x2=_l.x2, l.y1=_l.y1, l.y2=_l.y2, e=_e, D=_D, v=_v;
 				type=21;
 			}
+			GeoEx(const Point& _p, const Line& _l, const ex& _e, const lst& _v)
+			{
+				p.x=_p.x, p.y=_p.y, l.x1=_l.x1, l.x2=_l.x2, l.y1=_l.y1, l.y2=_l.y2, e=_e, v=_v;
+				type=30;
+			}
+			GeoEx(const Point& _p, const Line& _l, const ex& _e, const ex& _D, const lst& _v)
+			{
+				p.x=_p.x, p.y=_p.y, l.x1=_l.x1, l.x2=_l.x2, l.y1=_l.y1, l.y2=_l.y2, e=_e, D=_D, v=_v;
+				type=31;
+			}
 			Point p;	//store a point
 			Line l;		//store a line
 			ex e, D;	//e is the expression
-						//D is the generic condition
+					//D is the generic condition
 			lst v;		//the variable that should be solved
-			/*type: 10->Point;	20->Line;	*
-			 *		11->Point&D;21->Line&D;	*/
+			/*type: 10->Point;		20->Line;	30->Point&Line	*
+			 *	11->Point&D;		21->Line&D;	31->Point&Line&D*/
 			int type;
 		};
 		HilbertSt(){}
@@ -194,11 +213,11 @@ namespace Wizard
 		static Point st1() {symbol u1, u2; return Point(u1, u2);}
 		static Line st2() {symbol u1, u2, u3, u4; return Line(Point(u1, u2), Point(u3, u4));}
 		static Line st3(const Point& p) {symbol u1, u2; return Line(p, Point(u1, u2));}
-		//static Variable st4(Point p1, Point p2) {return Line(p1, p2);}
+		static Line st4(const Point p1, const Point p2) {return Line(p1, p2);}
 		/*steps which return a equation*/
-		static GeoEx st5(const Line& l) {symbol u1, x1; return GeoEx(Point(u1, x1), determinant(matrix{{u1, x1, 1}, {l.x1, l.y1, 1}, {l.x2, l.y2, 1}}), lst{u1, x1});}
-		static GeoEx st6(const Line& l) {symbol u1, u2, u3, x1; return GeoEx(Line(Point(u1, u2), Point(u3, x1)), ex((l.x2-l.x1)*(x1-u2)-(l.y2-l.y1)*(u3-u1)==0), lst{u1, u2, u3, x1});}
-		static GeoEx st7(const Line& l, const Point& p) {symbol u1, x1; return GeoEx(Line(Point(u1, x1), p), ex((l.x2-l.x1)*(x1-p.y)-(l.y2-l.y1)*(u1-p.x)==0), lst{u1, x1});}
+		static GeoEx st5(const Line& l) {symbol u1, x1; return GeoEx(Point(u1, x1), determinant(matrix{{u1, x1, 1}, {l.x1, l.y1, 1}, {l.x2, l.y2, 1}}), lst{x1});}
+		static GeoEx st6(const Line& l) {symbol u1, u2, u3, x1; return GeoEx(Line(Point(u1, u2), Point(u3, x1)), ex((l.x2-l.x1)*(x1-u2)-(l.y2-l.y1)*(u3-u1)==0), lst{x1});}
+		static GeoEx st7(const Line& l, const Point& p) {symbol u1, x1; return GeoEx(Point(u1, x1), Line(Point(u1, x1), p), ex((l.x2-l.x1)*(x1-p.y)-(l.y2-l.y1)*(u1-p.x)==0), lst{x1});}
 		/*steps which return two equations*/
 		static GeoEx st8(const Line& l1, const Line& l2) 	
 		{
