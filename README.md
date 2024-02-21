@@ -1,13 +1,13 @@
 # Wizard
 A geometry prover using Hilbert's axioms , Wu's method and GiNaC library.
 
-##Tutorial
-###Types
+## Tutorial
+### Types
 Point
 Line
 Segment
 GeoEx
-###Functions
+### Functions
 ex parallel(const Segment&, const Segment&)
 ex parallel(const Point&, const Point&, const Point&, const Point&)
 ex perpendicular(const Segment&, const Segment&)
@@ -21,7 +21,7 @@ lst Midpoint(const Point&, const Point&, const Point&)
 bool EquivalentProp(const lst&, const lst&)
 bool SubsProp(const lst&, const ex&)
 void append(lst& l1, const ex& l2)
-###HilbertSteps
+### HilbertSteps
 Point st1(): select an arbitrary point
 Line st2(): select an arbitrary line
 Line st3(const Point&): draw a line passing through a point
