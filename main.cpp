@@ -1,146 +1,66 @@
 /*This file isn't completed yet.*/
-#include "Wizard.h"
+/*Now the problem is:															*
+ *1.test1: ./Wizard --condition "Point(fABD,baCExy) st10(B,D,AD,AB,C) intersect(AC,BD,E)" --proposition "midpoint(E,AC) midpoint(E,BD)"	*
+ *  is **true**,															*
+ *  but ./Wizard --condition "Point(fABD,baCExy) intersect(AC,BD,E) st10(B,D,AD,AB,C)"  --proposition "midpoint(E,AC) midpoint(E,BD)"	*
+ *  is **false**.															*
+ *2.test2: st8(AD,BE,O) can't bring infomation to the three parallel conditions.							*
+ *3.debug infomation is too long.													*
+ *4.Wizard.hpp is tooooo long.														*
+ *															--Feb. 24, 2024	*/
+ 
+#include "Wizard.hpp"
 #include <unistd.h>
 #include <stdlib.h>
 #include <getopt.h>
 #include <vector>
 using namespace Wizard;
 
-class Analysis
-{
-public:
-	vector<string> SplitStr(const string& s, const char& delim)
-	{
-		vector<string> tokens;
-		size_t start = 0, end = 0;
-		while((end=s.find(delim, start))!=string::npos)
-		{
-			tokens.push_back(s.substr(start, end-start));
-			start=end+1;
-		}
-		tokens.push_back(s.substr(start));
-		return tokens;
-	}
-	string StrSegment(const string& s, const char& fr, const char& to)
-	{
-		int f=s.find(fr), t=s.find(to);
-		string rt=NULL;
-		for(int i=f+1; i<t; i++)
-			rt+=s[i];
-		return rt;
-	}
-	vector<string> SplitFunc(const string& s)
-	{
-		vector<string> strs=SplitStr(s, '(');					//erase '('
-		string name=strs[0];
-		vector<string> poses=SplitStr(str[1].erase(str[1].size()-1), ',');	//erase ')' and ','
-		int npos=poses.size();
-		if(npos==2||npos==3)
-			return poses;
-		else return NULL;
-	}
-	static struct VarPoint
-	{
-		const int max_v=100;
-		Point s[max_v]={};
-		bool free[max_v]={};
-		string name=NULL;
-		int vi=0;
-		void append(const Point& p, const bool& type, const char& n)
-		{
-			s[vi].x=p.x;
-			s[vi].y=p.y;
-			free[vi]=type;
-			name[vi]=n;
-			vi++;
-		}
-	}varp; 
-	Analysis(string anal)
-	{
-		vector<string> strs=SplitStr(anal, ' ');
-		for(int i=0; i<strs.size(); i++)
-		{
-			string type=(SplitStr(strs[i], '('))[0];
-			if(type=="Point")
-				AnalPoint(strs[i].erase(0, strs[i].find("Point")+4));
-			else if(type=="intersect"||type==""/*TODO*/)
-			{
-				SplitFunc()
-			}
-		}
-	}
-	~Analysic(){}
-	void AnalPoint(const string& anal)
-	{
-		for(int i=0; i<anal.size(); i++)
-		{
-			if(anal[i]==' '||anal[i]=='('||anal[i]==')'||anal[i]==',')continue;
-			if(anal[i]=='f')
-			{
-				string fp=StrSegment(anal, 'f', ',');
-				for(int j=0; j<fp.size(); j++)
-				{
-					if('A'<=fp[j]&&fp[j]<='Z')
-					{
-						Point fpoint(HilbertSt::st1());
-						var.append(fpoint, true, fp[j]);
-					}
-					else continue;
-				}
-			}
-			if(anal[i]=='c')
-			{
-				string cp=StrSegment(anal, 'c', ')');
-				for(int j=0; j<cp.size(); j++)
-				{
-					if('A'<=cp[j]&&cp[j]<='Z')
-					{
-						Point cpoint();
-						var.append(cpoint, false, cp[j]);
-					}
-					else continue;
-				}
-			}
-		}
-		return;
-	}
-	void AnalFunc(const string& anal)
-	{
-		
-	}
-}
+
+Analysis::VarPoint Analysis::varp; 
+lst Analysis::eqncond, Analysis::varcond, Analysis::Ds, Analysis::eqnprop, Analysis::varprop, Analysis::cov;
+ex Analysis::condslv, Analysis::propslv;
+bool Analysis::is_cov=false;
 
 int main(int argc, char* argv[])
 {
-	//./wizard --condition "Point(fABD,cCE) intersect(BC,AC,C) intersect(AC,BD,E) parallel(AB,CD) parallel(BC,AD)" --to-prove "midpoint(E,AC) midpoint(E,BD)"
+	//test1: ./Wizard --condition "Point(fABD,baCExy) st10(B,D,AD,AB,C) intersect(AC,BD,E)" --proposition "midpoint(E,AC) midpoint(E,BD)"
+	//test2: ./Wizard --condition "Point(fADBCO,baFxyE) st8(AD,BE,O) parallel(AB,DE) parallel(AC,DF) parallel(BC,EF)" --proposition "collinear(O,C,F)"
 	int opt;
-	const char *condition = NULL;
-	const char *to_prove = NULL;
+	const char *condition=NULL;
+	const char *proposition=NULL;
 	static struct option long_options[]=
 	{
 		{"condition", required_argument, NULL, 'c'},
-		{"to-prove", required_argument, NULL, 'p'},
+		{"proposition", required_argument, NULL, 'p'},
+		{"debug", no_argument, NULL, 'd'},
 		{NULL, 0, NULL, 0}
 	};
-	while((opt=getopt_long(argc, argv, "c:p:", long_options, NULL))!=-1) 
+	if(argc<=2)
+	{
+		cerr<<"Usage: "<<argv[0]<<" --condition <condition> --proposition <proposition>\n"<<endl;
+		return 1;
+	}
+	while((opt=getopt_long(argc, argv, "c:p:d", long_options, NULL))!=-1) 
 	{
 		switch(opt)
 		{
 		case 'c':
-			condition = optarg;
+			condition=optarg;
 			break;
 		case 'p':
-			to_prove = optarg;
+			proposition=optarg;
+			break;
+		case 'd':
+			debug=true;
 			break;
 		default:
-			fprintf(stderr, "Usage: %s --condition <condition> --to-prove <to_prove>\n", argv[0]);
-			return 1;
+			break;
 		}
 	}
-	
 	string cond=condition;
-	string prov=to_prove;
-	
-
+	string prop=proposition;
+	Analysis::AnalysisStr(cond, true);
+	Analysis::AnalysisStr(prop, false);
 	return 0;
 }

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Wizard.h"
+#include "Wizard.hpp"
 using namespace std;
 using namespace GiNaC;
 using namespace Wizard;
@@ -22,7 +22,7 @@ int main()
 	ex e3=parallel(B, C, B_, C_);
 	lst eqnlst={e1, e2, e3};
 	lst varlst={x1, x2, x3};
-	//cout<<eqnlst<<endl;
+	cout<<eqnlst<<endl;
 	//cout<<varlst<<endl;
 	ex slv=lsolve(eqnlst, varlst);
 	lst slvlst={};
@@ -35,7 +35,7 @@ int main()
 	cout<<"prop:"<<prop<<endl;
 	
 	/*judge if the proposition can be proved*/
-	if(SubsProp(slvlst, prop))
+	if(Analysis::SubsProp(slvlst, prop))
 	{
 		cout<<"true"<<endl;
 		cout<<"Note:\n";

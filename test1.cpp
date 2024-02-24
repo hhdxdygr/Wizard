@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Wizard.h"
+#include "Wizard.hpp"
 using namespace std;
 using namespace GiNaC;
 using namespace Wizard;
@@ -50,7 +50,8 @@ int main()
 	//cout<<"prop:"<<prop<<endl;
 	
 	/*judge if the two lists are equivalent*/
-	if(EquivalentProp(slvE_lst, prop))
+	/*you can use SubsProp(slvE_lst, prop), too*/
+	if(Analysis::EquivalentProp(slvE_lst, prop))
 	{
 		cout<<"true"<<endl;
 		cout<<"Note:\n";
