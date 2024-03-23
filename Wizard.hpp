@@ -2,6 +2,9 @@
 /*https://zh.z-library.se/book/11810820/2f0956/%E5%87%A0%E4%BD%95%E5%AE%9A%E7%90%86%E6%9C%BA%E5%99%A8%E8%AF%81%E6%98%8E%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86.html*/
 /*HilbertSt类内函数定义见3.5节*/
 
+#ifndef __WIZARD_HPP__
+#define __WIZARD_HPP__
+
 #include <iostream>
 #include <cstdio>
 #include <cmath>
@@ -16,7 +19,6 @@ namespace Wizard
 {
 	/* -d or --debug */
 	bool debug=false;
-	
 	/*Definition of Point*/
 	class Point
 	{
@@ -40,6 +42,11 @@ namespace Wizard
 		void print()
 		{
 			cout<<"("<<x<<","<<y<<")"<<endl;
+		}
+		friend ostream& operator<<(ostream& os, const Point& p)
+		{
+			os<<"("<<p.x<<","<<p.y<<")";
+			return os;
 		}
 		void modify(const ex& _x, const ex& _y)
 		{
@@ -251,6 +258,14 @@ namespace Wizard
 							{l.x2, l.y2, 1}}), 
 				     lst{x1});
 		}
+		static GeoEx st5(const Line& l, const Point& obj)
+		{
+			return GeoEx(obj, 
+				     determinant(matrix{{obj.x,obj.y,1}, 
+							{l.x1, l.y1, 1},
+							{l.x2, l.y2, 1}}), 
+				     lst{obj.y});
+		}
 		static GeoEx st6(const Line& l)
 		{
 			symbol u1, u2, u3, x1;
@@ -259,6 +274,12 @@ namespace Wizard
 				     ex((l.x2-l.x1)*(x1-u2)-(l.y2-l.y1)*(u3-u1)==0),
 				     lst{x1});
 		}
+		static GeoEx st6(const Line& l, const Point& obj1, const Point& obj2)
+		{
+			return GeoEx(Line(obj1, obj2),
+				     ex((l.x2-l.x1)*(obj2.y-obj1.y)-(l.y2-l.y1)*(obj2.x-obj1.x)==0),
+				     lst{obj2.y});
+		}
 		static GeoEx st7(const Line& l, const Point& p)
 		{
 			symbol u1, x1;
@@ -266,6 +287,12 @@ namespace Wizard
 				     Line(Point(u1, x1), p),
 				     ex((l.x2-l.x1)*(x1-p.y)-(l.y2-l.y1)*(u1-p.x)==0),
 				     lst{x1});
+		}
+		static GeoEx st7(const Line& l, const Point& p, const Point& obj)
+		{
+			return GeoEx(obj, Line(obj, p),
+				     ex((l.x2-l.x1)*(obj.y-p.y)-(l.y2-l.y1)*(obj.x-p.x)==0),
+				     lst{obj.y});
 		}
 		/*steps which return two equations*/
 		static GeoEx st8(const Line& l1, const Line& l2) 	
@@ -276,6 +303,13 @@ namespace Wizard
 				     ex(determinant(matrix{{l1.y1-l2.y2, l1.x2-l1.x1}, {l2.y1-l2.y2, l2.x2-l2.x1}})!=0),
 				     lst{x1, x2});
 		}
+		static GeoEx st8(const Line& l1, const Line& l2, const Point& obj) 	
+		{
+			return GeoEx(obj, lst{((l1.y1-l1.y2)*obj.x-(l1.x1-l1.x2)*obj.y+l1.x1*l1.y2-l1.x2*l1.y1==0), 
+					      ((l2.y1-l2.y2)*obj.x-(l2.x1-l2.x2)*obj.y+l2.x1*l2.y2-l2.x2*l2.y1==0)},
+				     ex(determinant(matrix{{l1.y1-l2.y2, l1.x2-l1.x1}, {l2.y1-l2.y2, l2.x2-l2.x1}})!=0),
+				     lst{obj.x, obj.y});
+		}
 		static GeoEx st9(const Point& p, const Line& l1, const Line& l2)
 		{
 			symbol x1, x2;
@@ -284,6 +318,13 @@ namespace Wizard
 				     ex(determinant(matrix{{l1.y2-l1.y1, l1.x1-l1.x2}, {l2.y1-l2.y2, l2.x2-l2.x1}})!=0),
 				     lst{x1, x2});
 		}
+		static GeoEx st9(const Point& p, const Line& l1, const Line& l2, const Point& obj)
+		{
+			return GeoEx(obj, lst{((l1.x2-l1.x1)*(obj.y-p.y)-(l1.y2-l1.y1)*(obj.x-p.x)==0),
+					      ((l2.y1-l2.y2)*obj.x-(l2.x1-l2.x2)*obj.y+l2.x1*l2.y2-l2.x2*l2.y1==0)},
+				     ex(determinant(matrix{{l1.y2-l1.y1, l1.x1-l1.x2}, {l2.y1-l2.y2, l2.x2-l2.x1}})!=0),
+				     lst{obj.x, obj.y});
+		}
 		static GeoEx st10(const Point& p1, const Point& p2, const Line& l1, const Line& l2) 
 		{
 			symbol x1, x2;
@@ -291,6 +332,13 @@ namespace Wizard
 							((p2.y-x2)*(l2.x2-l2.x1)-(l2.y2-l2.y1)*(p2.x-x1)==0)},
 				     ex(determinant(matrix{{l1.y2-l1.y1, l1.x1-l1.x2}, {l2.y2-l2.y1, l2.x1-l2.x2}})!=0),
 				     lst{x1, x2});
+		}
+		static GeoEx st10(const Point& p1, const Point& p2, const Line& l1, const Line& l2, const Point& obj) 
+		{
+			return GeoEx(obj, lst{((p1.y-obj.y)*(l1.x2-l1.x1)-(l1.y2-l1.y1)*(p1.x-obj.x)==0),
+					      ((p2.y-obj.y)*(l2.x2-l2.x1)-(l2.y2-l2.y1)*(p2.x-obj.x)==0)},
+				     ex(determinant(matrix{{l1.y2-l1.y1, l1.x1-l1.x2}, {l2.y2-l2.y1, l2.x1-l2.x2}})!=0),
+				     lst{obj.x, obj.y});
 		}
 	};
 
@@ -324,17 +372,20 @@ namespace Wizard
 			}
 			int findp(const char& p)
 			{
-				if(debug)
-				{
-					print();
-					cout<<endl;
-				}
 				for(int i=0; i<vi; i++)
 					if(name[i]==p)
 						return i;
 				string err=string("findp: cannot find point ")+string(&p, 1)+string("!\n");
 				throw runtime_error(err.c_str());
 				return -1;
+			}
+			Point getp(const char& p)
+			{
+				return s[findp(p)];
+			}
+			Point* getaddp(const char& p)
+			{
+				return &s[findp(p)];
 			}
 			void modifyp(const Point& p, const char& n)
 			{
@@ -354,7 +405,7 @@ namespace Wizard
 		static VarPoint varp; 
 		static lst eqncond, varcond, Ds, eqnprop, varprop, cov;
 		static ex condslv, propslv;
-		static bool is_cov;
+		static bool is_cov, is_es;
 		
 		/*determine whether the variable is bound or free*/
 		/* bound->false *
@@ -366,6 +417,7 @@ namespace Wizard
 					return false;
 			return true;
 		}
+		
 		/*determine whether the proposition is bound or free*/
 		/* bound->false *
 		 * free->true   */
@@ -373,13 +425,18 @@ namespace Wizard
 		static bool DetermineExpr(ex expr)
 		{
 			int lnum=0, rnum=0;
+			bool has_debugged=false;
 			if(is_a<lst>(expr))
 			{
+				if(debug)
+				{
+					for(int j=0; j<expr.nops(); j++)
+						cout<<"DetermineExpr: "<<expr.op(j)<<endl;
+				}
 				for(int j=0; j<expr.nops(); j++)
 				{
 					for(int i=0; i<varp.vi; i++)
 					{
-						if(debug)cout<<"DetermineExpr: "<<expr.op(j)<<endl;
 						if(is_a<numeric>(expr.op(j)))continue;
 						if(expr.op(j).op(0).has(varp.s[i].x)&&varp.free[i][0]==false)lnum++;
 						if(expr.op(j).op(0).has(varp.s[i].y)&&varp.free[i][1]==false)lnum++;
@@ -394,9 +451,9 @@ namespace Wizard
 			}
 			else
 			{
+				if(debug) cout<<"DetermineExpr: "<<expr<<endl;
 				for(int i=0; i<varp.vi; i++)
 				{
-					if(debug)cout<<"DetermineExpr: "<<expr<<endl;
 					if(is_a<numeric>(expr))continue;
 					if(expr.op(0).has(varp.s[i].x)&&varp.free[i][0]==false)lnum++;
 					if(expr.op(0).has(varp.s[i].y)&&varp.free[i][1]==false)lnum++;
@@ -420,6 +477,7 @@ namespace Wizard
 				if(!prop1.has(*i))return false;
 			return true;
 		}
+		
 		/*substitute slv into prop_eqn and judge*/
 		static bool SubsProp(const lst& slv, const ex& prop_eqn)
 		{
@@ -477,6 +535,7 @@ namespace Wizard
 				rt+=s[i];
 			return rt;
 		}
+		
 		/*
 		static vector<string> SplitFunc(const string& s)
 		{
@@ -541,7 +600,38 @@ namespace Wizard
 				}
 			}
 		}
-		static void AnalPoint(const string& anal)	//(fABD,bCE)
+		
+		/*Due to the shortcomings of this program, this function is crucial.*/
+		/*Establish a system in a plane and set some points artificially.*/
+		static void EstablishSystem(string esstr)	/*(oOxOADyOBE)*/
+		{
+			is_es=true;
+			for(int i=0; i<esstr.size(); i++)
+			{
+				if(esstr[i]==' '||esstr[i]=='('||esstr[i]==')')continue;
+				if(esstr[i]=='o')
+				{
+					varp.modifyp(Point(0,0), esstr[i+1]);
+				}
+				if(esstr[i]=='x')
+				{
+					string xstr=StrSegment(esstr, 'x', 'y');
+					//cout<<xstr<<endl;
+					for(int j=0; j<xstr.size(); j++)
+						varp.modifyp(Point(varp.getp(esstr[i+j+1]).x,0), esstr[i+j+1]);
+				}
+				if(esstr[i]=='y')
+				{
+					string ystr=StrSegment(esstr, 'y', ')');
+					//cout<<ystr<<endl;
+					for(int j=0; j<ystr.size(); j++)
+						varp.modifyp(Point(0,varp.getp(esstr[i+j+1]).y), esstr[i+j+1]);
+				}
+			}
+			if(debug)varp.print();
+		}
+		
+		static void AnalPoint(const string& anal, const bool& type)	//(fABD,bCE)
 		{
 			for(int i=0; i<anal.size(); i++)
 			{
@@ -565,7 +655,6 @@ namespace Wizard
 					string bpx=StrSegment(bp, 'x', 'y');			//bpx: ""
 					string bpy=bp.substr(bp.find("y")+1, bp.size()-1);	//bpy: ""
 					string bpa=StrSegment(bp, 'a', 'x');			//bpa: CE
-					if(debug)cout<<bpa<<' '<<bpx<<' '<<bpy<<endl;
 					for(int j=0; j<bpa.size(); j++)
 					{
 						if('A'<=bpa[j]&&bpa[j]<='Z')
@@ -595,8 +684,11 @@ namespace Wizard
 					}
 				}
 			}
+			if(type) append(varcond, varp.boundvars());	//condition
+			else append(varprop, varp.boundvars());		//proposition
 			return;
 		}
+		
 		static void AnalFunc(const string& anal, const string& func, const bool& type)
 		{
 			if(func=="intersect"||func=="st8")
@@ -607,12 +699,11 @@ namespace Wizard
 					throw runtime_error(err.c_str());
 				}
 				vector<string> poses=SplitPos(anal);						//3 parts(AC BD E)
-				Point 	tmp00(varp.s[varp.findp(poses[0][0])]), 
-					tmp01(varp.s[varp.findp(poses[0][1])]),
-					tmp10(varp.s[varp.findp(poses[1][0])]),
-					tmp11(varp.s[varp.findp(poses[1][1])]);
-				HilbertSt::GeoEx ge=HilbertSt::st8(Line(tmp00, tmp01), Line(tmp10, tmp11));	//with p, e, D, v
-				varp.modifyp(ge.p, poses[2][0]);	//modify the intersection point with st8
+				Point 	tmp00(varp.getp(poses[0][0])), 
+					tmp01(varp.getp(poses[0][1])),
+					tmp10(varp.getp(poses[1][0])),
+					tmp11(varp.getp(poses[1][1]));
+				HilbertSt::GeoEx ge=HilbertSt::st8(Line(tmp00, tmp01), Line(tmp10, tmp11), varp.getp(poses[2][0]));	//with p, e, D, v
 				ex isslv;
 				if(is_cov)
 				{
@@ -624,76 +715,23 @@ namespace Wizard
 				}
 				else
 				{
+					ex slv_pre=lsolve(eqncond, varcond);
+					cout<<"slv_pre: "<<slv_pre<<endl;
 					isslv=lsolve(ge.e, ge.v);	//solve the equations to change the variables
+					cout<<"isslv: "<<isslv<<endl;
+					isslv=isslv.subs(slv_pre);
+					cout<<"after subs isslv: "<<isslv<<endl;
 					is_cov=true;
 					append(cov, isslv);
 				}
 				if(debug)
 				{
-					cout<<"intersect eqns:"<<ge.e<<endl;
-					cout<<"intersect vars:"<<ge.v<<endl;
+					cout<<"intersect eqns: "<<ge.e<<endl;
+					cout<<"intersect vars: "<<ge.v<<endl;
 					cout<<"isslv:"<<isslv<<endl;
 				}
 				append(Ds, ge.D);
 					
-			}
-			if(func=="parallel")
-			{
-				vector<string> poses=SplitPos(anal);						//2 parts(AB CD)
-				Point 	tmp00(varp.s[varp.findp(poses[0][0])]), 
-					tmp01(varp.s[varp.findp(poses[0][1])]),
-					tmp10(varp.s[varp.findp(poses[1][0])]),
-					tmp11(varp.s[varp.findp(poses[1][1])]);
-				ex eqn_prl=parallel(tmp00, tmp01, tmp10, tmp11);
-				if(debug)cout<<"parallel eqn:"<<eqn_prl<<endl;
-				if(DetermineExpr(eqn_prl)==false&&type==false)
-				{
-					if(debug)
-						cout<<"bound:"<<eqn_prl<<endl;
-					return;
-				}
-				if(type==true)
-					append(eqncond, eqn_prl);
-				else	
-					append(eqnprop, eqn_prl);
-			}
-			if(func=="midpoint")									//2 parts(E AC)
-			{
-				vector<string> poses=SplitPos(anal);
-				Point 	tmp00(varp.s[varp.findp(poses[0][0])]), 
-					tmp10(varp.s[varp.findp(poses[1][0])]),
-					tmp11(varp.s[varp.findp(poses[1][1])]);
-				ex eqn_mp=Midpoint(tmp00, tmp10, tmp11);
-				if(debug)cout<<"midpoint eqn:"<<eqn_mp<<endl;
-				if(DetermineExpr(eqn_mp)==false&&type==false)
-				{
-					if(debug)
-						cout<<"bound:"<<eqn_mp<<endl;
-					return;
-				}
-				if(type==true)
-					append(eqncond, eqn_mp);
-				else
-					append(eqnprop, eqn_mp);
-			}
-			if(func=="collinear")
-			{
-				vector<string> poses=SplitPos(anal);
-				Point 	tmp0(varp.s[varp.findp(poses[0][0])]), 
-					tmp1(varp.s[varp.findp(poses[1][0])]),
-					tmp2(varp.s[varp.findp(poses[2][0])]);
-				ex eqn_cl=collinear(tmp0, tmp1, tmp2);
-				if(debug)cout<<"collinear eqn:"<<eqn_cl<<endl;
-				if(DetermineExpr(eqn_cl)==false&&type==false)
-				{
-					if(debug)
-						cout<<"bound:"<<eqn_cl<<endl;
-					return;
-				}
-				if(type==true)
-					append(eqncond, eqn_cl);
-				else
-					append(eqnprop, eqn_cl);
 			}
 			if(func=="st9")	//Point Line Line ->Point
 			{
@@ -703,13 +741,12 @@ namespace Wizard
 					throw runtime_error(err.c_str());
 				}
 				vector<string> poses=SplitPos(anal);
-				Point 	tmp00(varp.s[varp.findp(poses[0][0])]), 
-					tmp10(varp.s[varp.findp(poses[1][0])]),
-					tmp11(varp.s[varp.findp(poses[1][1])]),
-					tmp20(varp.s[varp.findp(poses[2][0])]),
-					tmp21(varp.s[varp.findp(poses[2][1])]);
-				HilbertSt::GeoEx ge=HilbertSt::st9(tmp00, Line(tmp10, tmp11), Line(tmp20, tmp21));
-				varp.modifyp(ge.p, poses[3][0]);	//modify the intersection point with st9
+				Point 	tmp00(varp.getp(poses[0][0])), 
+					tmp10(varp.getp(poses[1][0])),
+					tmp11(varp.getp(poses[1][1])),
+					tmp20(varp.getp(poses[2][0])),
+					tmp21(varp.getp(poses[2][1]));
+				HilbertSt::GeoEx ge=HilbertSt::st9(tmp00, Line(tmp10, tmp11), Line(tmp20, tmp21), varp.getp(poses[3][0]));
 				ex st9slv;
 				if(is_cov)
 				{
@@ -721,7 +758,9 @@ namespace Wizard
 				}
 				else
 				{
+					ex slv_pre=lsolve(eqncond, varcond);
 					st9slv=lsolve(ge.e, ge.v);
+					st9slv=st9slv.subs(slv_pre);
 					is_cov=true;
 					append(cov, st9slv);
 				}
@@ -736,14 +775,13 @@ namespace Wizard
 					throw runtime_error(err.c_str());
 				}
 				vector<string> poses=SplitPos(anal);
-				Point 	tmp00(varp.s[varp.findp(poses[0][0])]), 
-					tmp10(varp.s[varp.findp(poses[1][0])]),
-					tmp20(varp.s[varp.findp(poses[2][0])]),
-					tmp21(varp.s[varp.findp(poses[2][1])]),
-					tmp30(varp.s[varp.findp(poses[3][0])]),
-					tmp31(varp.s[varp.findp(poses[3][1])]);
-				HilbertSt::GeoEx ge=HilbertSt::st10(tmp00, tmp10, Line(tmp20, tmp21), Line(tmp30, tmp31));
-				varp.modifyp(ge.p, poses[4][0]);	//modify the intersection point with st10
+				Point 	tmp00(varp.getp(poses[0][0])), 
+					tmp10(varp.getp(poses[1][0])),
+					tmp20(varp.getp(poses[2][0])),
+					tmp21(varp.getp(poses[2][1])),
+					tmp30(varp.getp(poses[3][0])),
+					tmp31(varp.getp(poses[3][1]));
+				HilbertSt::GeoEx ge=HilbertSt::st10(tmp00, tmp10, Line(tmp20, tmp21), Line(tmp30, tmp31), varp.getp(poses[4][0]));
 				ex st10slv;
 				if(is_cov)
 				{
@@ -755,13 +793,74 @@ namespace Wizard
 				}
 				else
 				{
+					ex slv_pre=lsolve(eqncond, varcond);
 					st10slv=lsolve(ge.e, ge.v);
+					st10slv=st10slv.subs(slv_pre);
 					is_cov=true;
 					append(cov, st10slv);
 				}
 				append(Ds, ge.D);
 			}
+			if(func=="parallel")
+			{
+				vector<string> poses=SplitPos(anal);						//2 parts(AB CD)
+				Point 	tmp00(varp.getp(poses[0][0])), 
+					tmp01(varp.getp(poses[0][1])),
+					tmp10(varp.getp(poses[1][0])),
+					tmp11(varp.getp(poses[1][1]));
+				ex eqn_prl=parallel(tmp00, tmp01, tmp10, tmp11);
+				if(debug) cout<<"parallel eqn: "<<eqn_prl<<endl;
+				if(DetermineExpr(eqn_prl)==false&&type==false)
+				{
+					if(debug)
+						cout<<"bound:"<<eqn_prl<<endl;
+					return;
+				}
+				if(type==true)
+					append(eqncond, eqn_prl);
+				else	
+					append(eqnprop, eqn_prl);
+			}
+			if(func=="midpoint")									//2 parts(E AC)
+			{
+				vector<string> poses=SplitPos(anal);
+				Point 	tmp00(varp.getp(poses[0][0])), 
+					tmp10(varp.getp(poses[1][0])),
+					tmp11(varp.getp(poses[1][1]));
+				ex eqn_mp=Midpoint(tmp00, tmp10, tmp11);
+				if(debug) cout<<"midpoint eqns: "<<eqn_mp<<endl;
+				if(DetermineExpr(eqn_mp)==false&&type==false)
+				{
+					if(debug)
+						cout<<"bound:"<<eqn_mp<<endl;
+					return;
+				}
+				if(type==true)
+					append(eqncond, eqn_mp);
+				else
+					append(eqnprop, eqn_mp);
+			}
+			if(func=="collinear")
+			{
+				vector<string> poses=SplitPos(anal);
+				Point 	tmp0(varp.getp(poses[0][0])), 
+					tmp1(varp.getp(poses[1][0])),
+					tmp2(varp.getp(poses[2][0]));
+				ex eqn_cl=collinear(tmp0, tmp1, tmp2);
+				if(debug) cout<<"collinear eqn: "<<eqn_cl<<endl;
+				if(DetermineExpr(eqn_cl)==false&&type==false)
+				{
+					if(debug)
+						cout<<"bound:"<<eqn_cl<<endl;
+					return;
+				}
+				if(type==true)
+					append(eqncond, eqn_cl);
+				else
+					append(eqnprop, eqn_cl);
+			}
 		}
+		
 		/*type: condition  ->true  *
 		 *	proposition->false */
 		static void AnalysisStr(const string& anal, const bool& type)	//first
@@ -771,12 +870,12 @@ namespace Wizard
 			{
 				string func=(SplitStr(strs[i], '('))[0];
 				if(func=="Point")
-					AnalPoint(strs[i].erase(0, strs[i].find("Point")+5));		//the argument is like (fABD,bCE)
+					AnalPoint(strs[i].erase(0, strs[i].find("Point")+5), type);		//the argument is like (fABD,bCE)
+				else if(func=="EstSys")
+					EstablishSystem(strs[i].erase(0, strs[i].find("EstSys")+6));
 				else
 					AnalFunc(GetPos(strs[i]), func, type);
 			}
-			if(type)append(varcond, varp.boundvars());	//condition
-			else append(varprop, varp.boundvars());		//proposition
 			if(debug)varp.print();
 			SolveEqns(type);
 		}
@@ -784,3 +883,5 @@ namespace Wizard
 		~Analysis(){}
 	};
 };
+
+#endif
