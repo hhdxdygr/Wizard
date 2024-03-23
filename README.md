@@ -2,6 +2,28 @@
 A geometry prover using Hilbert's axioms , Wu's method and GiNaC library.
 
 ## Tutorial
+### Compile
+Install CLN and GiNaC:  
+[CLN](https://www.ginac.de/CLN/) [GiNaC](https://www.ginac.de/Download.html)  
+Compile CLN&GiNaC:  
+[Installation](https://www.ginac.de/tutorial/#Installation)  
+Compile Wizard:  
+`g++ main.cpp -o Wizard -lginac -lcln`  
+
+### Usage
+./Wizard --condition <condition> --proposition <proposition>  
+Point(fAB,baCxDEyFGH) means that you let Wizard create 8 points, A and B are free points, C is bound point(x&y are bound), D and E are x-bound(D.x and E.x are bound while D.y and E.y are free), F, G and H are y-bound(F.x, G.x and H.x are free while F.y, G.y and H.y are bound).  
+
+You can also establish a system by the function EstSys.  
+EstSys(oOxOADyOBE) means that you designate point O as the origin, with points O, B, and D located on the x-axis, and points O, C, and E located on the y-axis.  
+
+st_x means Hilbert steps(see [APIs](./#APIs))  
+parallel, collinear and midpoint are supported(see [APIs](./#APIs))  
+
+#### Example
+test1: ./Wizard --condition "Point(fABD,baCExy) st10(B,D,AD,AB,C) intersect(AC,BD,E)" --proposition "midpoint(E,AC) midpoint(E,BD)"  
+test2: ./Wizard --condition "Point(fADBCO,baFxyE) EstSys(oOxOADyOBE) parallel(AB,DE) parallel(AC,DF) parallel(BC,EF)" --proposition "collinear(O,C,F)"  
+
 ### APIs
 - Types
 	- Point  
@@ -33,19 +55,6 @@ A geometry prover using Hilbert's axioms , Wu's method and GiNaC library.
 	- GeoEx **st8**(const Line&, const Line&): draw the intersection point of two intersecting lines  
 	- GeoEx **st9**(const Point&, const Line&, const Line&): draw a line parallel to a given line passing through a point, and intersect it with another line to find the intersection point  
 	- GeoEx **st10**(const Point&, const Point&, const Line&, const Line&): draw two intersecting parallel lines passing through each of the two given points to find the intersection point  
-### Compile
-Install CLN and GiNaC:  
-[CLN](https://www.ginac.de/CLN/) [GiNaC](https://www.ginac.de/Download.html)  
-Compile CLN&GiNaC:  
-[Installation](https://www.ginac.de/tutorial/#Installation)  
-Compile Wizard:  
-`g++ main.cpp -o Wizard -lginac -lcln`  
-Usage:  
-./Wizard --condition <condition> --proposition <proposition>  
-Point(fAB,baCxDEyFGH) means you let Wizard create 8 points, A and B are free points, C is bound point(x&y are bound), D and E are x-bound(D.x and E.x are bound while D.y and E.y are free), F, G and H are y-bound(F.x, G.x and H.x are free while F.y, G.y and H.y are bound).  
-st_x means Hilbert steps(see [APIs](./#APIs))  
-parallel, collinear and midpoint are supported(see [APIs](./#APIs))  
-Example:  
-test1: ./Wizard --condition "Point(fABD,baCExy) st10(B,D,AD,AB,C) intersect(AC,BD,E)" --proposition "midpoint(E,AC) midpoint(E,BD)"  
-test2: ./Wizard --condition "Point(fADBCO,baFxyE) st8(AD,BE,O) parallel(AB,DE) parallel(AC,DF) parallel(BC,EF)" --proposition "collinear(O,C,F)"  
-Note: the program isn't completed yet. See main.cpp for more details.  
+
+### Note
+There are some TODOs yet. See main.cpp for more details.  
