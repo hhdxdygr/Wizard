@@ -1,11 +1,39 @@
-/*Cf. 《几何定理机器证明的基本原理》，吴文俊，科学出版社，1984年*/
-/*https://zh.z-library.se/book/11810820/2f0956/%E5%87%A0%E4%BD%95%E5%AE%9A%E7%90%86%E6%9C%BA%E5%99%A8%E8%AF%81%E6%98%8E%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86.html*/
-/*HilbertSt类内函数定义见3.5节*/
+/* This file implements all the necessary functions for handling geometric proof problems in Wizard. */
+
+/*
+ *  Wizard Copyright (C) 2024 hhdxdygr
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/*https://z-library.se/book/11810820/2f0956/%E5%87%A0%E4%BD%95%E5%AE%9A%E7%90%86%E6%9C%BA%E5%99%A8%E8%AF%81%E6%98%8E%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86.html*/
 
 #ifndef __WIZARD_HPP__
 #define __WIZARD_HPP__
 
+//ANSI color codes
+#define RESET	"\033[0m"
+#define RED	"\033[31m"
+#define GREEN	"\033[32m"
+#define YELLOW	"\033[33m"
+#define BLUE	"\033[34m"
+#define MAGENTA	"\033[35m"
+#define CYAN	"\033[36m"
+#define WHITE	"\033[37m"
+
 #include <iostream>
+#include <sstream>
 #include <cstdio>
 #include <cmath>
 #include <string>
@@ -112,7 +140,7 @@ namespace Wizard
 	void append(lst& l1, const ex& l2)
 	{
 		if(is_a<lst>(l2))
-			for(int i=0;i<l2.nops();i++)
+			for(size_t i=0; i<l2.nops(); i++)
 				l1.append(l2[i]);
 		else
 			l1.append(l2);
@@ -120,7 +148,7 @@ namespace Wizard
 	/*substitute lst with lst*/
 	void subs(lst& l1, const lst& l2)
 	{
-		for(int i=0; i<l1.nops(); i++)
+		for(size_t i=0; i<l1.nops(); i++)
 			l1.op(i)=l1.op(i).subs(l2);
 	}
 	
@@ -367,7 +395,17 @@ namespace Wizard
 			{
 				cout<<"Point\t\t\tis_free_x\tis_free_y"<<endl;
 				for(int i=0; i<vi; i++)
-					cout<<name[i]<<'('<<s[i].x<<','<<s[i].y<<')'<<'\t'<<free[i][0]<<"\t\t"<<free[i][1]<<endl;
+				{
+					//process the table by using a simple method
+					ostringstream oss;
+					oss<<"("<<s[i].x<<","<<s[i].y<<")";
+					if(oss.str().size()<9)
+						cout<<name[i]<<s[i]<<"\t\t\t"<<free[i][0]<<"\t\t"<<free[i][1]<<endl;
+					else if(oss.str().size()<13)
+						cout<<name[i]<<s[i]<<"\t\t"<<free[i][0]<<"\t\t"<<free[i][1]<<endl;
+					else 
+						cout<<name[i]<<s[i]<<"\t"<<free[i][0]<<"\t\t"<<free[i][1]<<endl;
+				}
 				return;
 			}
 			int findp(const char& p)
@@ -425,15 +463,14 @@ namespace Wizard
 		static bool DetermineExpr(ex expr)
 		{
 			int lnum=0, rnum=0;
-			bool has_debugged=false;
 			if(is_a<lst>(expr))
 			{
 				if(debug)
 				{
-					for(int j=0; j<expr.nops(); j++)
+					for(size_t j=0; j<expr.nops(); j++)
 						cout<<"DetermineExpr: "<<expr.op(j)<<endl;
 				}
-				for(int j=0; j<expr.nops(); j++)
+				for(size_t j=0; j<expr.nops(); j++)
 				{
 					for(int i=0; i<varp.vi; i++)
 					{
@@ -504,7 +541,7 @@ namespace Wizard
 		}
 		static bool SubsProp(const lst& slv, const lst& prop_eqn)
 		{
-			for(int i=0; i<prop_eqn.nops(); i++)
+			for(size_t i=0; i<prop_eqn.nops(); i++)
 			{
 				ex prv=prop_eqn[i].subs(slv);
 				relational rel=ex_to<relational>(prv);
@@ -519,7 +556,7 @@ namespace Wizard
 		{
 			vector<string> tokens;
 			int start=0, end=0;
-			while((end=s.find(delim, start))!=string::npos)
+			while((size_t(end=s.find(delim, start)))!=string::npos)
 			{
 				tokens.push_back(s.substr(start, end-start));
 				start=end+1;
@@ -569,8 +606,9 @@ namespace Wizard
 				condslv=lsolve(eqncond, varcond);
 				if(debug)
 				{
-					cout<<endl<<"eqncond to solve: "<<eqncond<<endl<<"varcond to solve: "<<varcond<<endl;
-					cout<<"condslv: "<<condslv<<endl;
+					cout<<endl<<YELLOW<<"eqncond to solve: "<<RESET<<eqncond<<endl;
+					cout<<YELLOW<<"varcond to solve: "<<RESET<<varcond<<endl;
+					cout<<YELLOW<<"condslv: "<<RESET<<condslv<<endl;
 				}
 			}
 			if(type==false)	//propsition
@@ -582,21 +620,22 @@ namespace Wizard
 				
 				if(debug)
 				{
-					cout<<endl<<"eqnprop to solve: "<<eqnprop<<endl<<"varprop to solve: "<<varprop<<endl;
-					cout<<"propslv: "<<propslv<<endl;
+					cout<<endl<<YELLOW<<"eqnprop to solve: "<<RESET<<eqnprop<<endl;
+					cout<<YELLOW<<"varprop to solve: "<<RESET<<varprop<<endl;
+					cout<<YELLOW<<"propslv: "<<RESET<<propslv<<endl;
 				}
 				/*QED!*/
 				if(SubsProp(condslv, propslv))
 				{
-					cout<<"Qed!"<<endl;
-					cout<<"Note:"<<endl;
+					cout<<endl<<GREEN<<"Qed!"<<RESET<<endl<<endl;
+					cout<<BLUE<<"Note:"<<RESET<<endl;
 					varp.print();
-					cout<<"Generic condition:"<<endl;
+					cout<<BLUE<<"Generic condition:"<<RESET<<endl;
 					cout<<Ds<<endl;
 				}
 				else
 				{
-					cout<<"false"<<endl;
+					cout<<RED<<"False"<<RESET<<endl;
 				}
 			}
 		}
@@ -606,7 +645,7 @@ namespace Wizard
 		static void EstablishSystem(string esstr)	/*(oOxOADyOBE)*/
 		{
 			is_es=true;
-			for(int i=0; i<esstr.size(); i++)
+			for(size_t i=0; i<esstr.size(); i++)
 			{
 				if(esstr[i]==' '||esstr[i]=='('||esstr[i]==')')continue;
 				if(esstr[i]=='o')
@@ -617,29 +656,29 @@ namespace Wizard
 				{
 					string xstr=StrSegment(esstr, 'x', 'y');
 					//cout<<xstr<<endl;
-					for(int j=0; j<xstr.size(); j++)
+					for(size_t j=0; j<xstr.size(); j++)
 						varp.modifyp(Point(varp.getp(esstr[i+j+1]).x,0), esstr[i+j+1]);
 				}
 				if(esstr[i]=='y')
 				{
 					string ystr=StrSegment(esstr, 'y', ')');
 					//cout<<ystr<<endl;
-					for(int j=0; j<ystr.size(); j++)
+					for(size_t j=0; j<ystr.size(); j++)
 						varp.modifyp(Point(0,varp.getp(esstr[i+j+1]).y), esstr[i+j+1]);
 				}
 			}
-			if(debug)varp.print();
+			//if(debug)varp.print();
 		}
 		
 		static void AnalPoint(const string& anal, const bool& type)	//(fABD,bCE)
 		{
-			for(int i=0; i<anal.size(); i++)
+			for(size_t i=0; i<anal.size(); i++)
 			{
 				if(anal[i]==' '||anal[i]=='('||anal[i]==')'||anal[i]==',')continue;
 				if(anal[i]=='f')
 				{
 					string fp=StrSegment(anal, 'f', ',');	//fp: ABD
-					for(int j=0; j<fp.size(); j++)
+					for(size_t j=0; j<fp.size(); j++)
 					{
 						if('A'<=fp[j]&&fp[j]<='Z')
 						{
@@ -655,7 +694,7 @@ namespace Wizard
 					string bpx=StrSegment(bp, 'x', 'y');			//bpx: ""
 					string bpy=bp.substr(bp.find("y")+1, bp.size()-1);	//bpy: ""
 					string bpa=StrSegment(bp, 'a', 'x');			//bpa: CE
-					for(int j=0; j<bpa.size(); j++)
+					for(size_t j=0; j<bpa.size(); j++)
 					{
 						if('A'<=bpa[j]&&bpa[j]<='Z')
 						{
@@ -664,7 +703,7 @@ namespace Wizard
 						}
 						else continue;
 					}
-					for(int j=0; j<bpx.size(); j++)
+					for(size_t j=0; j<bpx.size(); j++)
 					{
 						if('A'<=bpx[j]&&bpx[j]<='Z')
 						{
@@ -673,7 +712,7 @@ namespace Wizard
 						}
 						else continue;
 					}
-					for(int j=0; j<bpy.size(); j++)
+					for(size_t j=0; j<bpy.size(); j++)
 					{
 						if('A'<=bpy[j]&&bpy[j]<='Z')
 						{
@@ -866,7 +905,7 @@ namespace Wizard
 		static void AnalysisStr(const string& anal, const bool& type)	//first
 		{
 			vector<string> strs=SplitStr(anal, ' ');
-			for(int i=0; i<strs.size(); i++)
+			for(size_t i=0; i<strs.size(); i++)
 			{
 				string func=(SplitStr(strs[i], '('))[0];
 				if(func=="Point")
@@ -876,7 +915,6 @@ namespace Wizard
 				else
 					AnalFunc(GetPos(strs[i]), func, type);
 			}
-			if(debug)varp.print();
 			SolveEqns(type);
 		}
 		Analysis(){}
