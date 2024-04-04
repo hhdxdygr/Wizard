@@ -1,1 +1,5 @@
-See README.md.
+Here are some instructions on how to install Wizard.
+First, make sure you have autotools. If not, install now.
+Then, try `autoconf` and `automake --add-missing` in this dictionary.
+When you are ready, try `./configure`, `make` and `make check`.
+Now, you can run `./Wizard`.
