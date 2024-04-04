@@ -9,6 +9,9 @@ Compile CLN&GiNaC:
 [Installation](https://www.ginac.de/tutorial/#Installation)  
 Compile Wizard:  
 `g++ main.cpp -o Wizard -lginac -lcln`  
+or the whole program:  
+`./configure`  
+`make`  
 
 ### Usage
 ./Wizard --condition <condition> --proposition <proposition>  
