@@ -572,6 +572,16 @@ namespace Wizard
 				rt+=s[i];
 			return rt;
 		}
+		static string StrSegment(const string& s, const char& fr, const string& to)
+		{
+			int f=s.find(fr);
+			string rt="";
+			for(size_t i=f+1; i<s.size(); i++)
+				if(to.find(s[i])==string::npos)
+					rt+=s[i];
+				else break;
+			return rt;
+		}
 		
 		/*
 		static vector<string> SplitFunc(const string& s)
@@ -627,7 +637,10 @@ namespace Wizard
 				/*QED!*/
 				if(SubsProp(condslv, propslv))
 				{
-					cout<<endl<<GREEN<<"Qed!"<<RESET<<endl<<endl;
+					if(debug)
+						cout<<endl<<GREEN<<"Qed!"<<RESET<<endl<<endl;
+					else
+						cout<<GREEN<<"True"<<RESET<<endl;
 					cout<<BLUE<<"Note:"<<RESET<<endl;
 					varp.print();
 					cout<<BLUE<<"Generic condition:"<<RESET<<endl;
@@ -650,19 +663,19 @@ namespace Wizard
 				if(esstr[i]==' '||esstr[i]=='('||esstr[i]==')')continue;
 				if(esstr[i]=='o')
 				{
-					varp.modifyp(Point(0,0), esstr[i+1]);
+					string ostr=StrSegment(esstr, 'o', "oxy)");
+					for(size_t j=0; j<ostr.size(); j++)
+						varp.modifyp(Point(0,0), esstr[i+j+1]);
 				}
 				if(esstr[i]=='x')
 				{
-					string xstr=StrSegment(esstr, 'x', 'y');
-					//cout<<xstr<<endl;
+					string xstr=StrSegment(esstr, 'x', "oxy)");
 					for(size_t j=0; j<xstr.size(); j++)
 						varp.modifyp(Point(varp.getp(esstr[i+j+1]).x,0), esstr[i+j+1]);
 				}
 				if(esstr[i]=='y')
 				{
-					string ystr=StrSegment(esstr, 'y', ')');
-					//cout<<ystr<<endl;
+					string ystr=StrSegment(esstr, 'y', "oxy)");
 					for(size_t j=0; j<ystr.size(); j++)
 						varp.modifyp(Point(0,varp.getp(esstr[i+j+1]).y), esstr[i+j+1]);
 				}
@@ -670,14 +683,14 @@ namespace Wizard
 			//if(debug)varp.print();
 		}
 		
-		static void AnalPoint(const string& anal, const bool& type)	//(fABD,bCE)
+		static void AnalPoint(const string& anal, const bool& type)	//(fABD,baCExy) "f,baxy)"
 		{
 			for(size_t i=0; i<anal.size(); i++)
 			{
 				if(anal[i]==' '||anal[i]=='('||anal[i]==')'||anal[i]==',')continue;
 				if(anal[i]=='f')
 				{
-					string fp=StrSegment(anal, 'f', ',');	//fp: ABD
+					string fp=StrSegment(anal, 'f', ",baxy)");	//fp: ABD
 					for(size_t j=0; j<fp.size(); j++)
 					{
 						if('A'<=fp[j]&&fp[j]<='Z')
@@ -688,12 +701,12 @@ namespace Wizard
 						else continue;
 					}
 				}
-				if(anal[i]=='b')						//bp: aCExy
+				if(anal[i]=='b')					//bp: aCExy
 				{
-					string bp=StrSegment(anal, 'b', ')');
-					string bpx=StrSegment(bp, 'x', 'y');			//bpx: ""
-					string bpy=bp.substr(bp.find("y")+1, bp.size()-1);	//bpy: ""
-					string bpa=StrSegment(bp, 'a', 'x');			//bpa: CE
+					string bp=StrSegment(anal, 'b', "f,)");
+					string bpx=StrSegment(bp, 'x', "axy");
+					string bpy=StrSegment(bp, 'y', "axy");
+					string bpa=StrSegment(bp, 'a', "axy");
 					for(size_t j=0; j<bpa.size(); j++)
 					{
 						if('A'<=bpa[j]&&bpa[j]<='Z')

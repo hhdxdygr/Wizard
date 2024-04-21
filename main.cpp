@@ -33,6 +33,28 @@ lst Analysis::eqncond, Analysis::varcond, Analysis::Ds, Analysis::eqnprop, Analy
 ex Analysis::condslv, Analysis::propslv;
 bool Analysis::is_cov=false, Analysis::is_es=false;
 
+void usage()
+{
+	cout<<"Usage: "<<argv[0]<<" --condition <condition> --proposition <proposition>\n"<<endl;
+	return;
+}
+
+void version()
+{
+	
+}
+
+void help()
+{
+	usage();
+	return;
+}
+
+void console()
+{
+	//TODO
+}
+
 int main(int argc, char* argv[])
 {
 	//test1: ./Wizard --condition "Point(fABD,baCExy) st10(B,D,AD,AB,C) st8(AC,BD,E)" --proposition "midpoint(E,AC) midpoint(E,BD)"
@@ -46,14 +68,16 @@ int main(int argc, char* argv[])
 		{"condition", required_argument, NULL, 'c'},
 		{"proposition", required_argument, NULL, 'p'},
 		{"debug", no_argument, NULL, 'd'},
+		{"console", no_argument, NULL, 'C'},
+		{"version", no_argument, NULL, 'v'},
+		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
 	if(argc<=2)
 	{
-		cerr<<"Usage: "<<argv[0]<<" --condition <condition> --proposition <proposition>\n"<<endl;
-		return 1;
+		usage();
 	}
-	while((opt=getopt_long(argc, argv, "c:p:d", long_options, NULL))!=-1) 
+	while((opt=getopt_long(argc, argv, "c:p:d:C:v:h", long_options, NULL))!=-1) 
 	{
 		switch(opt)
 		{
@@ -65,6 +89,15 @@ int main(int argc, char* argv[])
 			break;
 		case 'd':
 			debug=true;
+			break;
+		case 'C':
+			console();
+			break;
+		case 'v':
+			version();
+			break;
+		case 'h':
+			help();
 			break;
 		default:
 			break;
