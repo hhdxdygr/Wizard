@@ -35,7 +35,14 @@ bool Analysis::is_cov=false, Analysis::is_es=false;
 
 void usage()
 {
-	cout<<"Usage: "<<argv[0]<<" --condition <condition> --proposition <proposition>\n"<<endl;
+	cout<<	"Usage: wizard -c <Condition> -p <Proposition> [-d]		\n"<<\
+		"	wizard {-h | --help | -V | --version}			\n"<<\
+		"								\n"<<\
+		"	-c, --condition			add condition		\n"<<\
+		"	-p, --proposition		add proposition		\n"<<\
+		"	-v, -d, --verbose, --debug	be verbose		\n"<<\
+		"	-C, --console			console mode		\n"<<\
+	endl;
 	return;
 }
 
@@ -52,7 +59,26 @@ void help()
 
 void console()
 {
-	//TODO
+	string str="", cond="", prop="";
+	
+	while(true)
+	{
+		getline(cin, str);
+		if(str=="condition"||str=="c")
+			getline(cin, cond);
+		if(str=="proposition"||str=="p")
+			getline(cin, prop);
+		if(str=="debug"||str=="verbose"||str=="d"||str=="v")
+			debug=true;
+		if(str=="help"||str=="h")
+			help();
+		if(str=="version"||str=="V")
+			version();
+		if(str=="start")
+			break;
+	}
+	Analysis::AnalysisStr(cond, true);
+	Analysis::AnalysisStr(prop, false);
 }
 
 int main(int argc, char* argv[])
@@ -67,17 +93,14 @@ int main(int argc, char* argv[])
 	{
 		{"condition", required_argument, NULL, 'c'},
 		{"proposition", required_argument, NULL, 'p'},
+		{"verbose", no_argument, NULL, 'v'},
 		{"debug", no_argument, NULL, 'd'},
 		{"console", no_argument, NULL, 'C'},
-		{"version", no_argument, NULL, 'v'},
+		{"version", no_argument, NULL, 'V'},
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
-	if(argc<=2)
-	{
-		usage();
-	}
-	while((opt=getopt_long(argc, argv, "c:p:d:C:v:h", long_options, NULL))!=-1) 
+	while((opt=getopt_long(argc, argv, "c:p:dCvVh", long_options, NULL))!=-1) 
 	{
 		switch(opt)
 		{
@@ -87,13 +110,14 @@ int main(int argc, char* argv[])
 		case 'p':
 			proposition=optarg;
 			break;
+		//case 'v':	// -v == -d
 		case 'd':
 			debug=true;
 			break;
 		case 'C':
 			console();
 			break;
-		case 'v':
+		case 'V':
 			version();
 			break;
 		case 'h':
